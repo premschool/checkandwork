@@ -1,0 +1,461 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(130deg,#f5edff,#eef7ff 56%,#effbf4);color:#30294b;min-height:100vh;font:400 15px Prompt,sans-serif}
+nav{border-bottom:1px solid white;background:#ffffffb5;backdrop-filter:blur(16px)}.nav,main{max-width:1160px;margin:auto;padding:18px 24px}.nav,.bar,.tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.nav strong{margin-right:auto}.nav i{color:#6744b0;margin-right:7px}
+main{padding-top:38px}h1{font-size:clamp(25px,4vw,40px);margin:0 0 6px}h2{margin:0 0 14px}.muted{color:#625a76}
+.card{background:#ffffffc9;border:1px solid #fff;border-radius:25px;padding:clamp(16px,4vw,30px);box-shadow:0 12px 36px #55407d14;margin-top:18px}
+button,input,select,textarea{font:inherit;border:1px solid #ddd5ec;border-radius:12px;padding:9px 13px;color:inherit;background:white}button{cursor:pointer;font-weight:500}button:hover{border-color:#7855bb}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #7855bb;outline-offset:2px}.primary,.active{background:#6443a6;color:white;border-color:#6443a6}.danger{color:#9c2950}.tabs{margin-top:22px}.bar{margin:0 0 15px}.bar label{display:grid;gap:4px}.scroll{overflow:auto;max-height:65vh;border-radius:13px}table{border-collapse:separate;border-spacing:0;width:100%;text-align:left;background:white}th,td{padding:10px 13px;border-bottom:1px solid #ebe5f3}th{background:#eee7fb;position:sticky;top:0;z-index:1}tbody tr:nth-child(even){background:#fcfaff}.matrix th:first-child,.matrix td:first-child{position:sticky;left:0;background:#f4edff;min-width:180px}.matrix th:first-child{z-index:2}.matrix input{width:94px}.matrix small{display:block}.total{background:#e9f8ef;padding:12px 16px;border-radius:12px;font-weight:600}textarea{width:100%;min-height:180px;margin-bottom:12px}[hidden]{display:none!important}form{margin-bottom:14px}.sign{text-align:right;margin:36px 0 0}.status{display:flex;gap:6px;flex-wrap:wrap}.status label{position:relative;cursor:pointer}.status input{position:absolute;opacity:0;width:1px;height:1px}.status span{display:block;padding:5px 9px;border:1px solid #ddd5ec;border-radius:10px;background:white;white-space:nowrap}.status input:focus-visible+span{outline:2px solid #6443a6}.status input:checked+span{background:#6443a6;color:white;border-color:#6443a6}.weekly{min-width:1050px;table-layout:fixed}.weekly th,.weekly td{border-right:1px solid #e6dff0;text-align:center;padding:8px;overflow-wrap:anywhere}.weekly td{height:84px}.weekly th:first-child{width:100px}.weekly th:nth-child(6){width:65px}.weekly .break{background:#eaf7ef;color:#365c48}.weekly button{width:100%;font-size:13px;padding:5px}.weekly .lesson{background:#eee7fb}.weekly small{display:block}.weekly button+button{margin-top:4px}.weekly .slot-actions{display:flex;gap:4px;justify-content:center;margin-top:4px}.weekly .slot-actions button{width:auto;min-width:32px;margin:0}.weekly .slot-add{min-height:54px;background:transparent;border-style:dashed}.attendanceList table{table-layout:fixed}.attendanceList th,.attendanceList td{overflow-wrap:anywhere}.attendanceList th:first-child{width:32%}.attendanceList .status span{padding:6px 8px}.attendanceSheet{table-layout:fixed;font-size:11px;min-width:740px}.attendanceSheet th,.attendanceSheet td{padding:3px 1px;text-align:center;border:1px solid #ddd;overflow-wrap:anywhere}.attendanceSheet th:nth-child(2),.attendanceSheet td:nth-child(2){text-align:left;padding-left:3px}.attendanceSheet th:first-child{width:4%}.attendanceSheet th:nth-child(2){width:22%}.attendanceSheet th:nth-last-child(-n+2){width:6%}.attendanceSheet th span{display:block}.lesson-open{border:0;background:transparent!important}.onlyPrint{display:none}
+@media(max-width:560px){.attendanceList table,.attendanceList tbody,.attendanceList tr,.attendanceList td{display:block}.attendanceList thead{position:absolute;clip-path:inset(50%)}.attendanceList td{padding:7px 9px;border:0}.attendanceList tr{border-bottom:1px solid #ebe5f3}.attendanceList .scroll{max-height:none}.attendanceList .status span{padding:8px}.attendanceList .status{gap:5px}}button:disabled{opacity:.55;cursor:wait}
+@page{size:A4 portrait;margin:14mm}
+@media print{body,main,.card{background:white;color:black;margin:0;padding:0;max-width:none;box-shadow:none;border:0;font-size:11pt}body *{visibility:hidden}body.printing #report,body.printing #report *{visibility:visible}nav,#student,.hero,.tabs,.noPrint,#session,#schedulePick,#attendance>p,#attendance>.bar,#attendanceForm,#teacher>p,.swal2-container{display:none!important}.onlyPrint{display:block}#report .attendanceSheet{min-width:0;font-size:8pt}#report .scroll{overflow:visible;max-height:none}#report th{position:static;background:none}#report th,#report td{border-color:#aaa}#report thead{display:table-header-group}tr,.sign{break-inside:avoid}}
+</style></head><body>
+<nav><div class="nav"><strong><i class="fa-solid fa-school" aria-hidden="true"></i> Check Time</strong><button id="studentNav" class="active">หน้าของนักเรียน</button><button id="teacherNav">หน้าระบบจัดการ (ครู)</button></div></nav>
+<main><section id="student"><h1>ตรวจสอบคะแนนเก็บ</h1><p class="muted">Check Time Student and Score System</p>
+<div class="card"><form id="lookup" class="bar"><label>รหัสนักเรียน<input name="id" required maxlength="50" placeholder="กรอกรหัสนักเรียน"></label><button class="primary" style="align-self:end"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> ค้นหา</button></form><div id="result" aria-live="polite"></div></div></section>
+<section id="teacher" hidden><div class="hero"><h1>ระบบจัดการของครู</h1></div><p id="compatibility" class="muted" role="status" hidden></p><div id="tabs" class="tabs"></div><div id="panel" class="card"></div></section></main>
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbysn7W4M5TKiAl4zXVrjNHVsaveoel9_gwSvSPJ6QZSlnhWQuCYrNcVDTMQx3m3W3lj/exec';
+const by = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => new Intl.NumberFormat('th-TH',{maximumFractionDigits:8}).format(n);
+const today = () => new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Bangkok'}).format(new Date());
+const forRoom = (task,section) => !task[3] || task[3]===section;
+const key = (a,b) => JSON.stringify([a,b]);
+let token='', tab=0, room='', db, busy=false;
+const labels=['กรอกคะแนน','รายงานสรุป A4','เพิ่มนักเรียน','ตั้งค่าช่องคะแนน','รายชื่อ','เช็คชื่อ','ห้องและตารางสอน','ตารางเช็คชื่อ'];
+let scheduleDraft=null, selectedLesson=null;
+const weekdays=['1','2','3','4','5'];
+const periods=['1','2','3','4','พัก','5','6','7','8'];
+const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+async function request(action,data={}) {
+  const payload={...data,action,token};
+  const output=await (window.google?.script?.run
+    ? new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).api(payload))
+    : fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(payload)})
+      .then(async response=>{
+        if (!response.ok || !(response.headers.get('content-type')||'').includes('application/json'))
+          throw new Error('API ยังไม่ตอบกลับเป็น JSON กรุณาตรวจ URL และเวอร์ชัน Web App');
+        return response.json();
+      }).catch(error=>{throw new Error(error instanceof TypeError?'เชื่อมต่อ API ไม่ได้ ลองเปิดหน้าเว็บจากลิงก์ /exec โดยตรง':error.message);}));
+  if (!output.ok) throw new Error(output.error);
+  return output.data;
+}
+async function work(task) {
+  if (busy) return;
+  busy=true;
+  Swal.fire({title:'กำลังประมวลผล',allowOutsideClick:false,allowEscapeKey:false,didOpen:()=>Swal.showLoading()});
+  try { await task(); Swal.close(); return true; }
+  catch(error) {
+    if (error.message.includes('เซสชันหมดอายุ')) showStudent();
+    await Swal.fire({icon:'error',text:error.message}); return false;
+  } finally { busy=false; }
+}
+function table(headers,rows,cls='') {
+  return rows.length?'<div class="scroll"><table class="'+cls+'"><thead><tr>'+headers.map(x=>'<th scope="col">'+x+'</th>').join('')+'</tr></thead><tbody>'+
+    rows.map(row=>'<tr>'+row.map(x=>'<td>'+x+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>':'<p class="muted">ยังไม่มีข้อมูล</p>';
+}
+function showStudent() {
+  token=''; db=null; scheduleDraft=null; selectedLesson=null; by('student').hidden=false; by('teacher').hidden=true; by('panel').innerHTML='';
+  by('studentNav').classList.add('active'); by('teacherNav').classList.remove('active');
+}
+by('studentNav').onclick=async()=>{
+  if (busy || !token) return;
+  await work(()=>request('logout'));
+  showStudent();
+};
+by('teacherNav').onclick=async()=>{
+  if (busy || token) return;
+  const pin=await Swal.fire({title:'เข้าสู่ระบบครู',input:'password',inputLabel:'PIN สำหรับครู',
+    inputAttributes:{inputmode:'numeric',maxlength:30},showCancelButton:true,confirmButtonText:'เข้าสู่ระบบ',cancelButtonText:'ยกเลิก',
+    inputValidator:v=>v?undefined:'กรุณากรอก PIN'});
+  if (!pin.isConfirmed) return;
+  const ok=await work(async()=>{
+    token=(await request('login',{pin:pin.value})).token;
+    await refresh();
+    by('student').hidden=true; by('teacher').hidden=false;
+    by('studentNav').classList.remove('active'); by('teacherNav').classList.add('active');
+  });
+  if (!ok) showStudent();
+};
+by('lookup').onsubmit=e=>{
+  e.preventDefault();
+  const id=e.currentTarget.elements.id.value.trim();
+  by('result').innerHTML='';
+  work(async()=>{
+    const {student,assignments,scores}=await request('lookup',{id});
+    const marks=new Map(scores.map(row=>[row[1],row[2]]));
+    const earned=assignments.reduce((sum,[id])=>sum+Number(marks.get(id)||0),0);
+    const max=assignments.reduce((sum,row)=>sum+Number(row[2]),0);
+    by('result').innerHTML='<h2>'+esc(student[1])+'</h2><p>รหัส '+esc(student[0])+' · ห้อง '+esc(student[2])+'</p>'+
+      table(['ภาระงาน','วิชา','วันที่สั่งงาน','คะแนนที่ได้','คะแนนเต็ม'],assignments.map(([id,name,full,,date,code,title])=>[esc(name),esc([code,title].filter(Boolean).join(' ')||'—'),esc(date||'—'),marks.has(id)?fmt(Number(marks.get(id))):'ยังไม่บันทึก',fmt(Number(full))]))+
+      '<p class="total">คะแนนรวม '+fmt(earned)+' / '+fmt(max)+'</p>';
+  });
+};
+function normalizeDashboard(data) {
+  if (!data || !['students','assignments','scores'].every(name=>Array.isArray(data[name])))
+    throw new Error('ข้อมูลหน้าครูไม่ครบ กรุณาตรวจเวอร์ชัน Code.gs และ Index.html ที่ Deploy');
+  return {
+    ...data,
+    rooms:[...new Set([...(Array.isArray(data.rooms)?data.rooms:[]),...data.students.map(row=>row[2])])]
+      .filter(room=>typeof room==='string' && room.trim()),
+    timetable:Array.isArray(data.timetable)?data.timetable:[],
+    scheduleAvailable:Array.isArray(data.rooms) && Array.isArray(data.timetable)
+  };
+}
+async function refresh() {
+  db=normalizeDashboard(await request('dashboard'));
+  const notice=by('compatibility');
+  notice.hidden=db.scheduleAvailable;
+  notice.textContent='API ยังไม่ส่งข้อมูลห้องและตารางสอน ให้อัปเดต Code.gs และ Setup.gs รัน setupDatabase แล้ว Deploy เวอร์ชันใหม่';
+  if (!db.scheduleAvailable && tab>=5) tab=0;
+  render();
+}
+function rooms(all=true) {
+  const values=[...db.rooms].sort((a,b)=>a.localeCompare(b,'th',{numeric:true}));
+  return (all?'<option value="">ทุกห้อง</option>':'<option value="">เลือกห้อง</option>')+
+    values.map(v=>'<option value="'+esc(v)+'"'+(v===room?' selected':'')+'>'+esc(v)+'</option>').join('');
+}
+function render() {
+  by('tabs').innerHTML=labels.map((name,i)=>!db.scheduleAvailable && i>=5?'':'<button data-tab="'+i+'" class="'+(i===tab?'active':'')+'">'+name+'</button>').join('');
+  by('tabs').querySelectorAll('button').forEach(button=>button.onclick=()=>{if(!busy){selectedLesson=null;tab=Number(button.dataset.tab);render();}});
+  const panel=by('panel');
+  const roster=db.students.filter(row=>!room||row[2]===room);
+  const visibleTasks=db.assignments.filter(task=>!room || forRoom(task,room));
+  const marks=new Map(db.scores.map(([sid,aid,score])=>[key(sid,aid),score]));
+  const filter='<label>ห้องเรียน<select id="room">'+rooms()+'</select></label>';
+  if (tab===0) {
+    panel.innerHTML='<h2>กรอกคะแนน</h2><form id="grade"><div class="bar">'+filter+
+      '<button class="primary" type="submit" style="align-self:end">บันทึกคะแนน</button></div>'+
+      (visibleTasks.length?table(['นักเรียน',...visibleTasks.map(([,name,max,taskRoom,date,code])=>esc(name)+'<br><small>'+esc(code?code+' · ':'')+esc(taskRoom||'ทุกห้อง')+' · เต็ม '+fmt(Number(max))+(date?' · '+esc(date):'')+'</small>')],
+        roster.map(([sid,name,section],i)=>[esc(name)+'<small>'+esc(sid)+' · '+esc(section)+'</small>',...visibleTasks.map(([aid,title,max,taskRoom],j)=>!forRoom([aid,title,max,taskRoom],section)?'—':
+          '<input type="number" step="any" min="0" max="'+esc(max)+'" aria-label="'+esc(name+' '+title)+'" data-i="'+i+'" data-j="'+j+'" value="'+esc(marks.get(key(sid,aid))??'')+'">')]),'matrix'):'<p>เพิ่มภาระงานในเมนูตั้งค่าช่องคะแนนก่อนกรอกคะแนน</p>')+'</form>';
+    by('grade').onsubmit=e=>{
+      e.preventDefault();
+      const changes=[...e.currentTarget.querySelectorAll('input')].flatMap(input=>{
+        const sid=roster[input.dataset.i][0], aid=visibleTasks[input.dataset.j][0];
+        const previous=marks.get(key(sid,aid))??'';
+        if (input.value===previous || (input.value!=='' && previous!=='' && Number(input.value)===Number(previous))) return [];
+        return [[sid,aid,input.value===''?'':input.valueAsNumber,previous]];
+      });
+      if (!changes.length) {Swal.fire({text:'ไม่มีคะแนนที่เปลี่ยนแปลง'});return;}
+      save('saveScores',{rows:changes},'บันทึกคะแนนแล้ว');
+    };
+  } else if (tab===1) {
+    panel.innerHTML='<div class="bar noPrint">'+filter+'<button id="print" class="primary" style="align-self:end">พิมพ์รายงาน</button></div>'+
+      '<article id="report"><h2>รายงานสรุปคะแนนเก็บ</h2><p>ห้อง '+esc(room||'ทั้งหมด')+' · วันที่ '+today()+'</p>'+
+      table(['รหัส','ชื่อ','ห้อง','คะแนนรวม','คะแนนเต็ม'],roster.map(([sid,name,section])=>{
+        const tasks=visibleTasks.filter(task=>forRoom(task,section));
+        return [esc(sid),esc(name),esc(section),fmt(tasks.reduce((sum,[aid])=>sum+Number(marks.get(key(sid,aid))||0),0)),
+          fmt(tasks.reduce((sum,task)=>sum+Number(task[2]),0))];
+      }))+
+      '<p class="sign">ลงชื่อ ................................................ ครูผู้บันทึกคะแนน</p></article>';
+    by('print').onclick=()=>{document.body.classList.add('printing');window.print();};
+  } else if(tab===2) {
+    panel.innerHTML='<h2>เพิ่มนักเรียนจาก Excel</h2><p>เลือกห้องปลายทาง แล้ววางรหัสนักเรียนและชื่อจาก Excel รหัสเดิมจะอัปเดตชื่อและย้ายเข้าห้องที่เลือก</p>'+
+      '<form id="importForm"><div class="bar"><label>ห้องปลายทาง<select name="targetRoom" required>'+rooms(false)+'</select></label></div><textarea aria-label="รายชื่อนักเรียน" name="rows" required placeholder="00123&#9;สมชาย ใจดี"></textarea>'+
+      '<button class="primary">บันทึกรายชื่อ</button></form>';
+    by('importForm').onsubmit=e=>{e.preventDefault();save('import',{text:e.currentTarget.elements.rows.value,room:e.currentTarget.elements.targetRoom.value},'บันทึกรายชื่อแล้ว');};
+  } else if(tab===3) {
+    const tasks=db.assignments;
+    panel.innerHTML='<h2>ตั้งค่าช่องคะแนน</h2>'+'<form id="taskForm" class="bar"><input type="hidden" name="task">'+
+      '<label>ชื่อภาระงาน<input name="title" maxlength="150" required></label><label>คะแนนเต็ม<input name="max" type="number" step="any" min="0" required></label>'+
+      '<label>ห้องเรียน<select name="taskRoom">'+rooms()+'</select></label><label>ชื่อวิชา<select name="courseCode"></select></label><label>วันที่สั่งงาน<input name="date" type="date" value="'+today()+'" required></label>'+
+      '<button class="primary" style="align-self:end">บันทึก</button><button type="reset" style="align-self:end">ล้างแบบฟอร์ม</button></form>'+
+      table(['ชื่องาน','วิชา','ห้องเรียน','วันที่สั่งงาน','คะแนนเต็ม','จัดการ'],tasks.map(([,name,max,taskRoom,date,code,title],i)=>[esc(name),esc([code,title].filter(Boolean).join(' ')||'—'),esc(taskRoom||'ทุกห้อง'),esc(date||'—'),fmt(Number(max)),
+        '<button data-edit="'+i+'">แก้ไข</button> <button class="danger" data-remove="'+i+'">ลบ</button>']));
+    const form=by('taskForm');
+    const courseSelect=form.elements.courseCode;
+    function setCourses(code='', legacyTitle='') {
+      const section=form.elements.taskRoom.value;
+      const options=new Map();
+      db.timetable.forEach(([lessonRoom,,lessonCode,title])=>{
+        if(section && section===lessonRoom && !options.has(lessonCode))options.set(lessonCode,title);
+      });
+      if(code && !options.has(code))options.set(code,legacyTitle);
+      courseSelect.replaceChildren(new Option(section?'ไม่ระบุวิชา':'เลือกห้องเพื่อดูรายวิชา',''));
+      [...options].sort((a,b)=>a[1].localeCompare(b[1],'th') || a[0].localeCompare(b[0],'th'))
+        .forEach(([id,title])=>courseSelect.add(new Option([title,id].filter(Boolean).join(' · '),id)));
+      courseSelect.value=code;
+      courseSelect.disabled=!section;
+    }
+    form.elements.taskRoom.onchange=()=>setCourses();
+    const setRoom=section=>{
+      form.elements.taskRoom.value=section||'';
+      form.elements.taskRoom.disabled=Boolean(section);
+    };
+    setCourses();
+    form.onreset=e=>{
+      e.preventDefault();
+      form.elements.task.value='';
+      form.elements.title.value='';
+      form.elements.max.value='';
+      form.elements.date.value=today();
+      setRoom('');
+      setCourses();
+    };
+    form.onsubmit=e=>{e.preventDefault();save('saveAssignment',{id:form.elements.task.value,title:form.elements.title.value,max:form.elements.max.value,room:form.elements.taskRoom.value,date:form.elements.date.value,courseCode:courseSelect.value},'บันทึกภาระงานแล้ว');};
+    panel.querySelectorAll('[data-edit]').forEach(button=>button.onclick=()=>{
+      const [id,title,max,taskRoom,date,code,subjectTitle]=tasks[button.dataset.edit];
+      form.elements.task.value=id;form.elements.title.value=title;form.elements.max.value=max;setRoom(code?taskRoom:'');form.elements.taskRoom.value=taskRoom||'';setCourses(code,subjectTitle);form.elements.date.value=date||'';form.elements.title.focus();
+    });
+    panel.querySelectorAll('[data-remove]').forEach(button=>button.onclick=()=>remove('deleteAssignment',tasks[button.dataset.remove][0],'ลบภาระงานและคะแนนของงานนี้'));
+  } else if(tab===4) {
+    panel.innerHTML='<h2>รายชื่อนักเรียน</h2><div class="bar">'+filter+'<label>ค้นหารายชื่อ<input id="search" type="search" placeholder="รหัส ชื่อ หรือห้อง"></label></div><div id="list"></div>';
+    const list=()=>{
+      const term=by('search').value.trim().toLocaleLowerCase('th');
+      const rows=roster.filter(row=>row.join(' ').toLocaleLowerCase('th').includes(term));
+      by('list').innerHTML=table(['รหัส','ชื่อ','ห้อง','จัดการ'],rows.map((row,i)=>[...row.map(esc),'<button class="danger" data-delete="'+i+'">ลบ</button>']));
+      by('list').querySelectorAll('[data-delete]').forEach(button=>button.onclick=()=>remove('deleteStudent',rows[button.dataset.delete][0],'ลบรายชื่อและคะแนนของนักเรียนคนนี้'));
+    };
+    by('search').oninput=list;list();
+  } else if(tab===5) {
+    panel.innerHTML='<h2>เช็คชื่อเข้าเรียน</h2><form id="session" class="bar"><label>วันที่<input type="date" name="date" value="'+today()+'" required></label>'+
+      '<label>ห้อง<select name="room" required>'+rooms(false)+'</select></label></form><div id="schedulePick"></div><div id="attendance"></div>';
+    const form=by('session');
+    const showSchedule=()=>{
+      by('attendance').innerHTML='';
+      const date=form.elements.date.value, selectedRoom=form.elements.room.value;
+      if(!date)return;
+      if(selectedLesson){
+        const [room,weekday,code,title,period]=selectedLesson;
+        by('schedulePick').innerHTML='<div class="bar"><button id="backSchedule">กลับตารางสอน</button></div>';
+        by('backSchedule').onclick=()=>{tab=6;selectedLesson=null;render();};
+        if(String(new Date(date+'T12:00:00Z').getUTCDay())!==weekday){
+          by('attendance').textContent='กรุณาเลือกวันที่ตรงกับวัน'+days[weekday];
+          return;
+        }
+        loadAttendance({date,room,code,title,period});
+        return;
+      }
+      const day=String(new Date(date+'T12:00:00Z').getUTCDay());
+      const options=db.timetable.filter(row=>row[0]===selectedRoom && row[1]===day)
+        .sort((a,b)=>a[4].localeCompare(b[4],'th',{numeric:true}));
+      by('schedulePick').innerHTML=options.length?table(['คาบ','รหัสวิชา','ชื่อวิชา',''],options.map(([, ,code,title,period],i)=>
+        [esc(period),esc(code),esc(title),'<button data-pick="'+i+'">เช็คชื่อคาบนี้</button>'])):
+        '<p class="muted">'+(selectedRoom?'ยังไม่มีคาบสอนของห้องนี้ในวันที่เลือก':'เลือกห้องเพื่อแสดงคาบเรียน')+'</p>';
+      by('schedulePick').querySelectorAll('[data-pick]').forEach(button=>button.onclick=()=>{
+        const [room,,code,title,period]=options[button.dataset.pick];
+        loadAttendance({date,room,code,title,period});
+      });
+    };
+    if(selectedLesson){
+      form.elements.room.value=selectedLesson[0];
+      form.elements.room.disabled=true;
+      const date=new Date(today()+'T12:00:00Z');
+      date.setUTCDate(date.getUTCDate()-(date.getUTCDay()-Number(selectedLesson[1])+7)%7);
+      form.elements.date.value=date.toISOString().slice(0,10);
+    }
+    form.onchange=showSchedule;
+    form.onsubmit=e=>e.preventDefault();
+    showSchedule();
+    function loadAttendance(details) {
+      work(async()=>{
+        const records=await request('attendance',details);
+        const statuses=new Map(records.map(row=>[row[0],row[6]]));
+        const caption='<p><strong>คาบ '+esc(details.period)+' · '+esc(details.code)+' '+esc(details.title)+' · ชั้น '+esc(details.room)+'</strong></p>';
+        const people=db.students.filter(row=>row[2]===details.room);
+        by('attendance').innerHTML=caption+'<div class="bar"><button id="attendanceSheet">ตารางเช็คชื่อ</button></div><div id="sheetPreview"></div>'+
+          '<form id="attendanceForm" class="attendanceList">'+table(['เลขที่ / ชื่อ–สกุล','สถานะ'],people.map(([id,name],i)=>[(i+1)+'. '+esc(name)+'<br><small>'+esc(id)+'</small>',
+          '<div class="status" role="group" aria-label="สถานะ '+esc(name)+'">'+
+          ['มาเรียน','สาย','ขาด','น','ล'].map((status,j)=>'<label><input type="radio" name="status'+i+'" value="'+status+'"'+
+            (j===0?' required':'')+((attendanceMark(statuses.get(id))===attendanceMark(status))?' checked':'')+
+            '><span>'+(({'น':'น · หนีเรียน','ล':'ล · ลา'})[status]||status)+'</span></label>').join('')+'</div>']))+
+          (people.length?'<div class="bar" style="margin-top:14px"><button type="button" id="presentAll">มาเรียนทุกคน</button><button class="primary">บันทึกเช็คชื่อ</button></div>':'')+'</form>';
+        by('attendanceSheet').onclick=()=>showAttendanceSheet(details);
+        if(!people.length)return;
+        const attendanceForm=by('attendanceForm');
+        by('presentAll').onclick=()=>attendanceForm.querySelectorAll('input[value="มาเรียน"]').forEach(input=>input.checked=true);
+        attendanceForm.onsubmit=async event=>{
+          event.preventDefault();
+          const rows=people.map(([id],i)=>[id,attendanceForm.elements['status'+i].value]);
+          if(await work(()=>request('saveAttendance',{...details,rows,previous:[...statuses.entries()].sort()}))){
+            statuses.clear(); rows.forEach(([id,status])=>statuses.set(id,status));
+            Swal.fire({icon:'success',text:'บันทึกเช็คชื่อแล้ว'});
+          }
+        };
+      });
+    };
+  }
+  if(tab===6) {
+    panel.innerHTML='<h2>ตารางสอนครู</h2><form id="newRoom" class="bar"><label>ชื่อห้อง<input name="room" required maxlength="50" placeholder="ม.4/1"></label>'+
+      '<button class="primary" style="align-self:end">เพิ่มห้อง</button></form>'+
+      '<div class="bar"><button id="editSchedule" class="primary">แก้ไขตาราง</button>'+
+      '<button id="saveSchedule" class="primary" hidden>บันทึกตาราง</button><button id="cancelSchedule" hidden>ยกเลิก</button></div>'+
+      '<form id="subject" class="bar" hidden><label>ห้อง<select name="room" required>'+rooms(false)+'</select></label>'+
+      '<label>วัน<select name="day">'+weekdays.map(day=>'<option value="'+day+'">วัน'+days[day]+'</option>').join('')+'</select></label>'+
+      '<label>คาบ<select name="period">'+periods.filter(period=>period!=='พัก').map(period=>'<option value="'+period+'">คาบ '+period+'</option>').join('')+'</select></label>'+
+      '<label>รหัสวิชา<input name="code" required maxlength="30"></label><label>ชื่อวิชา<input name="title" required maxlength="150"></label>'+
+      '<button class="primary" style="align-self:end" type="submit" aria-label="ยืนยันคาบลงในตาราง" title="ยืนยันคาบลงในตาราง">✓</button></form>'+
+      '<div id="weeklySchedule"></div>';
+    by('newRoom').onsubmit=e=>{e.preventDefault();save('addRoom',{room:e.currentTarget.elements.room.value},'เพิ่มห้องแล้ว');};
+    const subject=by('subject');
+    let editingIndex=-1;
+    const resetLesson=()=>{
+      editingIndex=-1;
+      subject.elements.code.value='';
+      subject.elements.title.value='';
+    };
+    by('editSchedule').onclick=()=>{
+      scheduleDraft={previous:db.timetable,rows:db.timetable.slice()};
+      renderWeekly();
+    };
+    by('cancelSchedule').onclick=()=>{scheduleDraft=null;resetLesson();renderWeekly();};
+    by('saveSchedule').onclick=async()=>{
+      if (!scheduleDraft || busy) return;
+      if (subject.elements.code.value.trim() || subject.elements.title.value.trim()) {
+        await Swal.fire({text:'กด ✓ เพื่อยืนยันวิชาที่กำลังกรอกก่อนบันทึกตาราง'});
+        return;
+      }
+      if(await work(async()=>{
+        await request('saveTimetable',scheduleDraft);
+        scheduleDraft=null;
+        await refresh();
+      })) Swal.fire({icon:'success',text:'บันทึกตารางแล้ว'});
+    };
+    subject.onsubmit=e=>{
+      e.preventDefault();
+      if(!scheduleDraft)return;
+      const [room,day,code,title,period]=['room','day','code','title','period'].map(name=>subject.elements[name].value.trim());
+      if(!code || !title){Swal.fire({text:'กรุณากรอกรหัสและชื่อวิชา'});return;}
+      if(scheduleDraft.rows.some((row,i)=>i!==editingIndex && row[1]===day && row[4]===period)){
+        Swal.fire({text:'คาบนี้มีวิชาอยู่แล้ว กด ✓ ในช่องเพื่อเลือกแก้ไขวิชาเดิม หรือเลือกคาบว่าง'});
+        return;
+      }
+      const row=[room,day,code,title,period];
+      if(editingIndex<0)scheduleDraft.rows.push(row);
+      else scheduleDraft.rows[editingIndex]=row;
+      resetLesson();
+      renderWeekly();
+    };
+    function renderWeekly() {
+      const editing=Boolean(scheduleDraft);
+      const rows=editing?scheduleDraft.rows:db.timetable;
+      by('editSchedule').hidden=editing;
+      by('saveSchedule').hidden=!editing;
+      by('cancelSchedule').hidden=!editing;
+      subject.hidden=!editing;
+      const slots=new Map(), extra=[];
+      rows.forEach(([,day,,,period],i)=>{
+        if(!weekdays.includes(day) || !periods.includes(period) || period==='พัก'){extra.push(i);return;}
+        const slot=key(day,period);
+        if(!slots.has(slot))slots.set(slot,[]);
+        slots.get(slot).push(i);
+      });
+      const remove=i=>editing?'<button type="button" class="danger" data-drop="'+i+'" aria-label="นำคาบนี้ออก" title="นำคาบนี้ออก">×</button>':'';
+      const lesson=i=>{
+        const [room,,code,title]=rows[i];
+        const content='<strong>'+esc(code)+'</strong><small>'+esc(title)+'</small><small>'+esc(room)+'</small>';
+        if(!editing)return '<button type="button" class="lesson lesson-open" data-open-lesson="'+i+'">'+content+'</button>';
+        return '<div class="lesson">'+content+
+          (editing?'<div class="slot-actions"><button type="button" data-lesson="'+i+'" aria-label="เลือกคาบเพื่อแก้ไข" title="เลือกคาบเพื่อแก้ไข">✓</button>'+remove(i)+'</div>':'')+'</div>';
+      };
+      const weekly=by('weeklySchedule');
+      weekly.innerHTML='<div class="scroll"><table class="weekly"><thead><tr><th scope="col">วัน</th>'+
+        periods.map(period=>period==='พัก'?'<th scope="col" class="break">พัก</th>':'<th scope="col">คาบที่ '+period+'</th>').join('')+
+        '</tr></thead><tbody>'+weekdays.map(day=>'<tr><th scope="row">วัน'+days[day]+'</th>'+periods.map(period=>{
+          if(period==='พัก')return '<td class="break">พัก</td>';
+          const items=slots.get(key(day,period));
+          if(items)return '<td>'+items.map(lesson).join('')+'</td>';
+          return editing?'<td><button type="button" class="slot-add" data-day="'+day+'" data-period="'+period+
+            '" aria-label="เลือกวัน'+days[day]+' คาบ '+period+'">✓</button></td>':'<td></td>';
+        }).join('')+'</tr>').join('')+'</tbody></table></div>'+
+        (extra.length?'<h3>คาบนอกตารางจันทร์–ศุกร์</h3>'+table(['วัน','คาบ','รหัสวิชา','ชื่อวิชา','ห้องเรียน',...(editing?['จัดการ']:[])],
+          extra.map(i=>{const [room,day,code,title,period]=rows[i];return [esc(days[day]||day),esc(period),esc(code),esc(title),esc(room),...(editing?[remove(i)]:[])];})):'');
+      weekly.querySelectorAll('[data-open-lesson]').forEach(button=>button.onclick=()=>{
+        selectedLesson=rows[button.dataset.openLesson];
+        tab=5;
+        render();
+      });
+      weekly.querySelectorAll('[data-period]').forEach(button=>button.onclick=()=>{
+        editingIndex=-1;
+        subject.elements.day.value=button.dataset.day;
+        subject.elements.period.value=button.dataset.period;
+        if(subject.reportValidity())subject.requestSubmit();
+        else subject.elements.room.focus();
+      });
+      weekly.querySelectorAll('[data-lesson]').forEach(button=>button.onclick=()=>{
+        editingIndex=Number(button.dataset.lesson);
+        const [room,day,code,title,period]=rows[editingIndex];
+        Object.entries({room,day,code,title,period}).forEach(([name,value])=>subject.elements[name].value=value);
+        subject.elements.code.focus();
+      });
+      weekly.querySelectorAll('[data-drop]').forEach(button=>button.onclick=()=>{
+        const index=Number(button.dataset.drop);
+        scheduleDraft.rows.splice(index,1);
+        if(editingIndex===index)resetLesson();
+        else if(editingIndex>index)editingIndex--;
+        renderWeekly();
+      });
+    }
+    renderWeekly();
+  }
+  if(tab===7){
+    panel.innerHTML='<h2 class="noPrint">ตารางเช็คชื่อ</h2><form id="historyForm" class="bar noPrint">'+
+      '<label>ห้องเรียน<select name="section" required><option value="">เลือกห้องเรียน</option></select></label>'+
+      '<label>รายวิชา<select name="course" required disabled><option value="">เลือกรายวิชา</option></select></label>'+
+      '<button class="primary">ดูประวัติ</button></form><div id="sheetPreview"></div>';
+    const form=by('historyForm');
+    const section=form.elements.section, course=form.elements.course;
+    let courses=[];
+    section.onchange=()=>{
+      by('sheetPreview').innerHTML='';
+      course.replaceChildren(new Option('เลือกรายวิชา',''));
+      courses.filter(row=>row[0]===section.value)
+        .sort((a,b)=>a[2].localeCompare(b[2],'th') || a[1].localeCompare(b[1],'th'))
+        .forEach(([,code,title])=>course.add(new Option(title+' · '+code,code)));
+      course.disabled=course.options.length===1;
+    };
+    course.onchange=()=>{by('sheetPreview').innerHTML='';};
+    form.onsubmit=e=>{
+      e.preventDefault();
+      const selected=courses.find(row=>row[0]===section.value && row[1]===course.value);
+      if(selected)showAttendanceSheet({room:selected[0],code:selected[1],title:selected[2]},0,true);
+    };
+    work(async()=>{
+      courses=await request('attendanceCourses');
+      const sections=[...new Set(courses.map(row=>row[0]))].sort((a,b)=>a.localeCompare(b,'th',{numeric:true}));
+      sections.forEach(room=>section.add(new Option(room,room)));
+      if(sections.includes(room)){section.value=room;section.onchange();}
+    });
+  }
+  if(by('room'))by('room').onchange=e=>{room=e.target.value;render();};
+}
+function attendanceMark(status) {
+  return ({'มาเรียน':'/','มา':'/','สาย':'ส','ขาด':'ข','ลา':'ล','หนีเรียน':'น'})[status] || status;
+}
+function showAttendanceSheet(details,page=0,history=false) {
+  work(async()=>{
+    const {dates,people,pageCount}=await request('attendanceReport',{...details,page});
+    const headings=Array.from({length:20},(_,i)=>dates[i]
+      ? '<span>'+esc(dates[i].slice(8,10))+'</span><span>'+esc(dates[i].slice(5,7))+'</span>' : '—');
+    const rows=people.map(({name,marks},i)=>{
+      const present=marks.filter(mark=>mark==='/').length;
+      const recorded=marks.filter(Boolean).length;
+      return [i+1,esc(name),...headings.map((_,j)=>esc(marks[j]||'')),present,recorded?fmt(Math.round(1000*present/recorded)/10)+'%':'—'];
+    });
+    by('sheetPreview').innerHTML='<div class="bar noPrint"><button id="printAttendance" class="primary">พิมพ์ A4</button>'+
+      '<button id="closeAttendance">ปิดใบรายชื่อ</button>'+
+      (history && pageCount>1?'<button id="olderAttendance" '+(page+1>=pageCount?'disabled':'')+'>ช่วงเก่ากว่า</button>'+
+        '<button id="newerAttendance" '+(page===0?'disabled':'')+'>ช่วงใหม่กว่า</button> <span>ช่วง '+(page+1)+' / '+pageCount+'</span>':'')+'</div><article id="report"><h2>ตารางเช็คชื่อ</h2><p>รายวิชา '+esc(details.code)+' '+esc(details.title)+
+      ' · ชั้น '+esc(details.room)+'</p>'+(dates.length?'<p>'+esc(dates[0])+' ถึง '+esc(dates.at(-1))+'</p>':'<p>ยังไม่มีวันที่บันทึกการเช็คชื่อ</p>')+
+      table(['เลขที่','ชื่อ–สกุล',...headings,'รวมมา','%'],rows,'attendanceSheet')+
+      '<p><small>/ มาเรียน · ข ขาด · ส สาย · น หนีเรียน · ล ลา · % คิดจากจำนวนวันมาเรียน ÷ วันที่มีการบันทึกของนักเรียน</small></p></article>';
+    if(by('olderAttendance'))by('olderAttendance').onclick=()=>showAttendanceSheet(details,page+1,true);
+    if(by('newerAttendance'))by('newerAttendance').onclick=()=>showAttendanceSheet(details,page-1,true);
+    by('closeAttendance').onclick=()=>by('sheetPreview').innerHTML='';
+    by('printAttendance').onclick=()=>{document.body.classList.add('printing');window.print();};
+  });
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('printing'));
+async function save(action,data,message) {
+  if(await work(async()=>{await request(action,data);await refresh();})) Swal.fire({icon:'success',text:message});
+}
+async function remove(action,id,title) {
+  if(busy)return;
+  const answer=await Swal.fire({icon:'warning',title,showCancelButton:true,confirmButtonText:'ยืนยันการลบ',cancelButtonText:'ยกเลิก'});
+  if(answer.isConfirmed)save(action,{id},'ลบข้อมูลแล้ว');
+}
+</script></body></html>
